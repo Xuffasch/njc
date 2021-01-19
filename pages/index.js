@@ -34,9 +34,9 @@ export default function Home({ bois, lego }) {
             return <li key={produit.id}>
               {produit.jouet}
               <picture>
-                {/* <source srcSet={`${image_webp[0].url}`} /> */}
-                <source srcSet={`${image[0].url}`} />
-                <img src={`${image[0].url}`} alt={`${produit.jouet}`} width="190" height="190" />
+                <source srcSet={`${image_webp[0].url}`} type="image/webp" />
+                {/* <source srcSet={`${image[0].url}`} type="image/jpg"/> */}
+                <img src={`${image[0].url}`} type="image/jpg" alt={`${produit.jouet}`} width="190" height="190" />
               </picture>
             </li>
           })}
