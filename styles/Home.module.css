@@ -1,5 +1,5 @@
 .main {
-    @apply h-screen w-screen bg-yellow-400;
+    @apply h-full w-screen bg-yellow-400;
 }
 
 .title {
