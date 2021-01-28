@@ -5,18 +5,37 @@ import { getJouets } from '../lib/airtable'
 
 export async function getStaticProps() {
   const allBois = await getJouets("Bois");
-  console.log("bois : ", allBois);
-  const allLego = await getJouets("Lego");
-  console.log("lego : ", allLego);
   return {
     props: {
       bois: allBois,
-      lego: allLego,
     }
   }
 }
 
-export default function Home({ bois, lego }) {
+const order = async (e) => {
+  e.preventDefault();
+  const article = e.target.dataset;
+  let res = await fetch('/api/order', {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      records: [
+        {
+          fields: {
+            ...article,
+          }
+        }
+      ]
+    })
+  })
+  .then(res => res.json())
+
+  console.log("add to cart : ", res);
+}
+
+export default function Home({ bois }) {
   return (
     <>
       <Head>
@@ -28,11 +47,14 @@ export default function Home({ bois, lego }) {
         <ul>
           {bois.results.map(produit => {
             let image = produit.images.filter(i => i.filename.indexOf(".webp") === -1);
-            console.log("image : ", image);
             let image_webp = produit.images.filter(i => i.filename.indexOf(".webp") !== -1);
-            console.log("image webp : ", image_webp);
             return <li key={produit.id}>
-              {produit.jouet}
+              <h2 className='mx-2'>{produit.jouet}</h2>
+              <p className='mx-2'>{`${produit.prix} €`}</p>
+              <form>
+                <input className='p-2' id='quantity' type='number' min='0' defaultValue='0' step='0.01'/>
+                <button id='order' className='mx-2 p-2 bg-red-600 active:bg-red-400 border-2 border-white text-white rounded-lg focus:outline-none' type='submit' data-id={produit.id} data-jouet={produit.jouet} data-code={produit.code} data-prix={produit.prix} onClick={order}>Ajouter au Panier</button>
+              </form>
               <picture>
                 <source srcSet={`${image_webp[0].url}`} type="image/webp" alt={`${produit.jouet}`} width="190" height="190" />
                 <img src={`${image[0].url}`} type="image/jpg" alt={`${produit.jouet}`} width="190" height="190" />
