@@ -1,6 +1,6 @@
 {
     "github": {
-        "enabled": true
+        "enabled": false
     },
     "functions": {
         "pages/api/order.js": {
