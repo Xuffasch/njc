@@ -1,5 +1,8 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Head from 'next/head';
+import { useEffect } from 'react';
+import styles from '../styles/Home.module.css';
+
+import { Workbox } from 'workbox-window';
 
 import { getJouets } from '../lib/airtable'
 
@@ -36,6 +39,31 @@ const order = async (e) => {
 }
 
 export default function Home({ bois }) {
+  useEffect( async () => {
+    if ( 'serviceWorker' in navigator ) {
+      console.log('Global : ', global);
+      const wb = new Workbox('sw.js', { scope : '/' });
+      wb.register();
+    }
+
+    navigator.serviceWorker.onmessage = (event) => {
+      console.log('index.js receives message from service worker : ', event)
+      switch (event.data.type) {
+        case 'sw_activated':
+          navigator.serviceWorker.controller.postMessage( {
+            type: 'ping'
+          });
+          break;
+        case 'sw_pinged':
+          console.log('service worker has been correctly pinged and return this message : ', event.data.message);
+          break;
+        default: 
+          console.log('message from service worker : ', event);
+      }
+
+    } 
+  })
+
   return (
     <>
       <Head>
@@ -43,7 +71,10 @@ export default function Home({ bois }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <h1 className={styles.title}>Welcome to my Toy Store !</h1>
+        <header>
+          <h1 className={styles.title}>Welcome to my Toy Store !</h1>
+        </header>
+        
         <ul>
           {bois.results.map(produit => {
             let image = produit.images.filter(i => i.filename.indexOf(".webp") === -1);
